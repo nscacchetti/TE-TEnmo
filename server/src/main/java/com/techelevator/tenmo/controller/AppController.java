@@ -2,9 +2,9 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.JdbcAccountDao;
 import com.techelevator.tenmo.dao.JdbcUserDao;
-import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.Account;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,8 +17,15 @@ import java.math.BigDecimal;
 @PreAuthorize("isAuthenticated()") //check to be authenticated
 public class AppController {
 
+    JdbcTemplate jdbcTemplate;
     private JdbcUserDao jdbcUserDao;
     private JdbcAccountDao jdbcAccountDao;
+
+    public AppController(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.jdbcUserDao = new JdbcUserDao(this.jdbcTemplate);
+        this.jdbcAccountDao = new JdbcAccountDao(this.jdbcTemplate);
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/account/create", method = RequestMethod.POST)
