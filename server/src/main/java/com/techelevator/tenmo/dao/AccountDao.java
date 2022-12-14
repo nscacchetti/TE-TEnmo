@@ -10,6 +10,6 @@ public interface AccountDao {
 
     Account get(int accountId);
 
-    void create(Account account);
+    int create(Account account);
 
 }

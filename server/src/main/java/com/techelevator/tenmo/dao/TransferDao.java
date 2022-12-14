@@ -8,7 +8,7 @@ public interface TransferDao {
 
     List<Transfer> getAll();
 
-    void addTransfer(Transfer transfer);
+    int addTransfer(Transfer transfer);
 
     Transfer get(int transferId);
 
