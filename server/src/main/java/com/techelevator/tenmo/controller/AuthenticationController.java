@@ -23,7 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Controller to authenticate users.
  */
-@RestController
+@RestController //no need to preAuthorize to allow all to log in
 public class AuthenticationController {
 
     private final TokenProvider tokenProvider;
