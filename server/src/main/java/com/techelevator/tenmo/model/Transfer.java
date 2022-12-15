@@ -1,5 +1,7 @@
 package com.techelevator.tenmo.model;
 
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 public class Transfer {
@@ -7,6 +9,12 @@ public class Transfer {
     private BigDecimal transferAmount;
     private int userTo;
     private int userFrom;
+
+    @AssertTrue
+    boolean usersMatch = userTo != userFrom;
+
+    @AssertTrue
+    boolean transferMoreThanZero = transferAmount.compareTo(BigDecimal.ZERO) > 0;
 
     public Transfer() {
     }
