@@ -3,6 +3,7 @@ package com.techelevator.tenmo.controller;
 import com.techelevator.tenmo.dao.JdbcAccountDao;
 import com.techelevator.tenmo.dao.JdbcTransferDao;
 import com.techelevator.tenmo.dao.JdbcUserDao;
+import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
@@ -84,7 +85,8 @@ public class AppController {
     public void newTransfer(@Valid @RequestBody Transfer transfer) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         String username =  securityContext.getAuthentication().getName();
-        boolean checkUser = username.equals(transfer.getUserFrom());  //cannot transfer bucks from another's account
+        int currentUserId = jdbcUserDao.findIdByUsername(username);
+        boolean checkUser = currentUserId == transfer.getUserFrom();  //cannot transfer bucks from another's account
         if(!checkUser){
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "Transfer from other user not permitted"

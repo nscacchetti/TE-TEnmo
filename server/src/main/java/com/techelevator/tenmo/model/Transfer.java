@@ -1,5 +1,7 @@
 package com.techelevator.tenmo.model;
 
+import org.hibernate.validator.constraints.Range;
+
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
@@ -10,11 +12,14 @@ public class Transfer {
     private int userTo;
     private int userFrom;
 
-    @AssertTrue
-    boolean usersMatch = userTo != userFrom;
+//    @Range (min = 0, max = 10000)
+//            @Range (min = -10000, max = 0)
+//    int Match = userTo - userFrom;
 
-    @AssertTrue
-    boolean transferMoreThanZero = transferAmount.compareTo(BigDecimal.ZERO) > 0;
+
+
+//    @Min
+//    boolean transferMoreThanZero = transferAmount.compareTo(BigDecimal.ZERO) > 0;
 
     public Transfer() {
     }
