@@ -36,12 +36,16 @@ public class Account {
         return accountID;
     }
     public BigDecimal increaseAccount (BigDecimal transferAmt){
-        this.balance = this.balance.add(transferAmt);
-        return balance;
+        if(this.balance.add(transferAmt).compareTo(BigDecimal.ZERO) >= 0) {
+            this.balance = this.balance.add(transferAmt);
+            return balance;
+        } else {
+            throw new RuntimeException ("Not enough money in account.");
+        }
     }
 
     public BigDecimal decreaseAccount (BigDecimal transferAmt) throws RuntimeException {
-        if(this.balance.subtract(transfer).compareTo(BigDecimal.ZERO) >= 0){
+        if(this.balance.subtract(transferAmt).compareTo(BigDecimal.ZERO) >= 0){
             this.balance = this.balance.subtract(transferAmt);
             return balance;
         } else {

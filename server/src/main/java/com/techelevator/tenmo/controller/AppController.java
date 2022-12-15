@@ -80,18 +80,19 @@ public class AppController {
     }
 
     @ResponseStatus (HttpStatus.CREATED)
-    @RequestMapping(value = "/transfers/new", method = RequestMethod.POST) //cannot transfer bucks from another's account
+    @RequestMapping(value = "/transfers/new", method = RequestMethod.POST)
     public void newTransfer(@Valid @RequestBody Transfer transfer) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         String username =  securityContext.getAuthentication().getName();
-        boolean checkUser = username.equals(transfer.getUserFrom());
+        boolean checkUser = username.equals(transfer.getUserFrom());  //cannot transfer bucks from another's account
         if(!checkUser){
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "Transfer from other user not permitted"
             );
         }
         // need to transfer the bucks, need to do exception handling for decrease amt in Account.java
-        jdbcAccountDao.
+//        jdbcAccountDao.
+
 
         jdbcTransferDao.addTransfer(transfer);
 
