@@ -79,7 +79,7 @@ public class AppController {
         return transfer;
     }
 
-    @ResponseStatus (HttpStatus.CREATED)
+    @ResponseStatus (HttpStatus.ACCEPTED)
     @RequestMapping(value = "/transfers/new", method = RequestMethod.POST)
     public void newTransfer(@Valid @RequestBody Transfer transfer) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
@@ -93,6 +93,16 @@ public class AppController {
         // need to transfer the bucks, need to do exception handling for decrease amt in Account.java
 //        jdbcAccountDao.
 
+
+
+        Account fromAccount = jdbcAccountDao.get(transfer.getUserFrom());
+        Account toAccount = jdbcAccountDao.get(transfer.getUserTo());
+
+        fromAccount.decreaseAccount(transfer.getTransferAmount());
+        toAccount.increaseAccount(transfer.getTransferAmount());
+
+        jdbcAccountDao.update(fromAccount);
+        jdbcAccountDao.update(toAccount);
 
         jdbcTransferDao.addTransfer(transfer);
 

@@ -35,6 +35,7 @@ public class Account {
     public int getAccountID() {
         return accountID;
     }
+
     public BigDecimal increaseAccount (BigDecimal transferAmt){
         if(this.balance.add(transferAmt).compareTo(BigDecimal.ZERO) >= 0) {
             this.balance = this.balance.add(transferAmt);
