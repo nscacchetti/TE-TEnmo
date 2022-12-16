@@ -118,8 +118,8 @@ public class AppController {
         jdbcAccountDao.update(fromAccount);
         jdbcAccountDao.update(toAccount);
 
-        jdbcTransferDao.addTransfer(transfer);
-        return transfer.getTransferId();
+        int newTransferId = jdbcTransferDao.addTransfer(transfer);
+        return newTransferId;
     }
 }
 

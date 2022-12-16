@@ -1,25 +1,21 @@
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.techelevator.tenmo.model.*;
 
-import junit.runner.Version;
+import org.json.JSONArray;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import com.techelevator.tenmo.model.User;
 import org.junit.runners.MethodSorters;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.validation.constraints.AssertTrue;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -163,16 +159,21 @@ public class AppControllerTests {
 
     @Test
 
-    public void Test4_test_create_transfer() {
+    public void Test4_a_Test_4_b_test_create_and_get_by_transfer() {
         Transfer transfer = new Transfer(BigDecimal.valueOf(200.00), 1002, 1001);
         HttpHeaders headers = new HttpHeaders();
-        System.out.println("user1Token equals " + user1Token.getToken());
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(user1Token.getToken());
         HttpEntity entity = new HttpEntity<>(transfer, headers);
-        restTemplate.exchange(API_BASE_URL + "/transfers/new", HttpMethod.POST, entity, Void.class);
+//        int newTransferId= restTemplate.exchange(API_BASE_URL + "/transfers/new", HttpMethod.POST, entity, Integer.class).getBody().intValue();
+        int newTransferId= restTemplate.exchange(API_BASE_URL + "/transfers/new", HttpMethod.POST, entity, Integer.class).getBody();
 
-
+        // we look up the new transfer id in the db using the api for /transfers/{id}
+        Transfer transferInDB = restTemplate.exchange(API_BASE_URL + "/transfers/" + newTransferId, HttpMethod.GET, entity, Transfer.class).getBody();
+        //The app controller should find no transfer object with that id and it will return null. check if the new object is null.
+        assertEquals(transfer.getTransferAmount().compareTo(transferInDB.getTransferAmount()),0);
+        assertEquals(transfer.getUserFrom(),transferInDB.getUserFrom());
+        assertEquals(transfer.getUserTo(),transferInDB.getUserTo());
     }
     @Test
 
