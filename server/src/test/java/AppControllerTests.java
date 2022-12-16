@@ -1,11 +1,13 @@
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.techelevator.tenmo.model.*;
 
 import junit.runner.Version;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
-
+import com.techelevator.tenmo.model.User;
 import org.junit.runners.MethodSorters;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +19,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.AssertTrue;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -187,8 +191,38 @@ public class AppControllerTests {
         assertNull(transferIdInDB);
 //      equivilent statement  assertEquals(null,transferIdInDB);
     }
+@Test
+    public void Test6_list_of_users() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(user1Token.getToken());
+        HttpEntity entity = new HttpEntity<>(headers);
+//        Use resttemplate to send the http request, send me a response containing class List, give me the list in the body (.getbody)
+        List<User> listOfUsers= restTemplate.exchange(API_BASE_URL + "/list_of_users", HttpMethod.GET, entity, ArrayList.class).getBody();
+    System.out.println(listOfUsers.toString());
+//        check that the list contains only/exactly user1 and user2
+        assertTrue(listOfUsers.size()==2);
 
+//        check user1
+    System.out.println(listOfUsers.get(0));
+    ObjectMapper mapper= new ObjectMapper();
+//    User firstUser = mapper.convertValue(listOfUsers.get(0), new TypeReference<User>(){});
+//    @TODO convert response object to USER class currently just pulling int from string
+    String user1MapString = String.valueOf(listOfUsers.get(0));
+    System.out.println("userMap= "+user1MapString);
+        int expected = 1001;
+        int actual = Integer.parseInt(user1MapString.substring(4,8));
 
+        assertEquals(expected, actual);
+
+//        check user2
+    String user2MapString = String.valueOf(listOfUsers.get(1));
+    System.out.println("userMap= "+user2MapString);
+    expected = 1002;
+    actual = Integer.parseInt(user2MapString.substring(4,8));
+
+    assertEquals(expected, actual);
+//      equivilent statement  assertEquals(null,transferIdInDB);
+    }
 }
 
 
