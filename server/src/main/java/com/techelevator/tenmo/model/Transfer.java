@@ -11,6 +11,10 @@ public class Transfer {
     private BigDecimal transferAmount;
     private int userTo;
     private int userFrom;
+    @AssertTrue
+    private boolean notSendingToSelf;
+    @AssertTrue
+    private boolean transactionGreaterThanZero;
 
 //    @Range (min = 0, max = 10000)
 //            @Range (min = -10000, max = 0)
@@ -22,12 +26,19 @@ public class Transfer {
 //    boolean transferMoreThanZero = transferAmount.compareTo(BigDecimal.ZERO) > 0;
 
     public Transfer() {
+       notSendingToSelf=true;
+
+       transactionGreaterThanZero=true;
     }
 
     public Transfer(BigDecimal transferAmount, int userTo, int userFrom) {
+
         this.transferAmount = transferAmount;
         this.userTo = userTo;
         this.userFrom = userFrom;
+        notSendingToSelf = userTo != userFrom;
+        transactionGreaterThanZero = transferAmount.compareTo(BigDecimal.ZERO) > 0;
+
     }
 
     public Transfer(int transferId, BigDecimal transferAmount, int userTo, int userFrom) {
@@ -35,6 +46,8 @@ public class Transfer {
         this.transferAmount = transferAmount;
         this.userTo = userTo;
         this.userFrom = userFrom;
+        notSendingToSelf = userTo != userFrom;
+        transactionGreaterThanZero = transferAmount.compareTo(BigDecimal.ZERO) > 0;
     }
 
     public int getTransferId() {

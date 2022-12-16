@@ -42,7 +42,7 @@ public class JdbcTransferDao implements TransferDao{
     }
 
     @Override
-    public Transfer get(int transferId) {
+    public Transfer getByTransfer(int transferId) {
         String sql = "Select * FROM transfers WHERE transfer_id = ?";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, transferId);
         if (rowSet.next()){
@@ -51,6 +51,18 @@ public class JdbcTransferDao implements TransferDao{
             return transfer;
         }
         return null;
+    }
+
+    @Override
+    public List<Transfer> getByUserId(int userId) {
+        List<Transfer> accounts = new ArrayList<>();
+        String sql = "Select * FROM transfers where from_user_id = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql,userId);
+        while (results.next()){
+            Transfer transfer = mapRowToTransfer(results);
+            accounts.add(transfer);
+        }
+        return accounts;
     }
 
     private Transfer mapRowToTransfer(SqlRowSet rowSet) {

@@ -75,14 +75,26 @@ public class AppController {
         String username =  securityContext.getAuthentication().getName();
         int userId = jdbcUserDao.findIdByUsername(username);
 
-        List<Transfer> transfer = jdbcTransferDao.getAll();
+        List<Transfer> transfer = jdbcTransferDao.getByUserId(userId);
 
         return transfer;
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(value = "/transfers/{id}", method = RequestMethod.GET)
+    public Transfer transferById(@PathVariable int id){
+
+
+        Transfer transfer = jdbcTransferDao.getByTransfer(id);
+
+        return transfer;
+    }
+
+
+
     @ResponseStatus (HttpStatus.ACCEPTED)
     @RequestMapping(value = "/transfers/new", method = RequestMethod.POST)
-    public void newTransfer(@Valid @RequestBody Transfer transfer) {
+    public int newTransfer(@Valid @RequestBody Transfer transfer) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         String username =  securityContext.getAuthentication().getName();
         int currentUserId = jdbcUserDao.findIdByUsername(username);
@@ -107,7 +119,7 @@ public class AppController {
         jdbcAccountDao.update(toAccount);
 
         jdbcTransferDao.addTransfer(transfer);
-
+        return transfer.getTransferId();
     }
 }
 

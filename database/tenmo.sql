@@ -30,7 +30,9 @@ CREATE TABLE account (
 	user_id int NOT NULL UNIQUE,
 	balance numeric(13, 2) NOT NULL,
 	CONSTRAINT PK_account PRIMARY KEY (account_id),
-	CONSTRAINT FK_account_tenmo_user FOREIGN KEY (user_id) REFERENCES tenmo_user (user_id)
+	CONSTRAINT PK_account_tenmo_user FOREIGN KEY (user_id) REFERENCES tenmo_user (user_id),
+-- 	https://www.w3schools.com/sql/sql_unique.asp
+	CONSTRAINT UC_User UNIQUE (user_id)
 );
 
 CREATE SEQUENCE seq_transfers_id
