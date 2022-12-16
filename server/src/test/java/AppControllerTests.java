@@ -1,4 +1,6 @@
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.techelevator.tenmo.model.*;
 
@@ -151,6 +153,8 @@ public class AppControllerTests {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(user1Token.getToken());
         HttpEntity entity = new HttpEntity<>(transfer, headers);
+        BigDecimal orgAccountBalance = restTemplate.exchange(API_BASE_URL + "/account/balance", HttpMethod.GET, entity, BigDecimal.class).getBody();
+
 //        int newTransferId= restTemplate.exchange(API_BASE_URL + "/transfers/new", HttpMethod.POST, entity, Integer.class).getBody().intValue();
         int newTransferId= restTemplate.exchange(API_BASE_URL + "/transfers/new", HttpMethod.POST, entity, Integer.class).getBody();
 
@@ -160,6 +164,11 @@ public class AppControllerTests {
         assertEquals(transfer.getTransferAmount().compareTo(transferInDB.getTransferAmount()),0);
         assertEquals(transfer.getUserFrom(),transferInDB.getUserFrom());
         assertEquals(transfer.getUserTo(),transferInDB.getUserTo());
+//        @TODO check balances
+        BigDecimal newAccountBalance = restTemplate.exchange(API_BASE_URL + "/account/balance", HttpMethod.GET, entity, BigDecimal.class).getBody();
+        BigDecimal expected = orgAccountBalance.subtract(BigDecimal.valueOf(200));
+        BigDecimal actual = newAccountBalance;
+        assertEquals(0,actual.compareTo(expected));
     }
     @Test
     public void Test4_c_list_of_my_transfers() {
@@ -190,6 +199,35 @@ public class AppControllerTests {
         assertNull(transferIdInDB);
 //      equivilent statement  assertEquals(null,transferIdInDB);
     }
+
+    @Test
+    public void Test6a_list_of_users() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(user1Token.getToken());
+        HttpEntity entity = new HttpEntity<>(headers);
+//        Use resttemplate to send the http request, send me a response containing class List, give me the list in the body (.getbody)
+       String response = restTemplate.exchange(API_BASE_URL + "/list_of_users", HttpMethod.GET, entity, String.class).getBody();
+        System.out.println("TEST: ");
+        System.out.println(response);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode json = objectMapper.readTree(response);
+            for (int i=0; i < json.size(); i++) {
+                String currentUserId = json.path(i).path("id").asText();
+                System.out.println(currentUserId);
+            }
+
+            String idOfFirst = json.path(0).path("id").asText();
+            assertEquals("1001", idOfFirst);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 @Test
     public void Test6_list_of_users() {
         HttpHeaders headers = new HttpHeaders();
@@ -204,7 +242,11 @@ public class AppControllerTests {
 //        check user1
     System.out.println(listOfUsers.get(0));
     ObjectMapper mapper= new ObjectMapper();
+
+    User firstUsers = listOfUsers.get(0);
+
 //    User firstUser = mapper.convertValue(listOfUsers.get(0), new TypeReference<User>(){});
+//User firstUse
 //    @TODO convert response object to USER class currently just pulling int from string
     String user1MapString = String.valueOf(listOfUsers.get(0));
     System.out.println("userMap= "+user1MapString);
