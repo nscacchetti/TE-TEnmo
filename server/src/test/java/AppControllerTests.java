@@ -2,7 +2,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.techelevator.tenmo.model.*;
 
-import org.json.JSONArray;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -15,7 +14,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -26,6 +24,8 @@ public class AppControllerTests {
     private final RestTemplate restTemplate = new RestTemplate();
     private TokenDTO user1Token;
     private TokenDTO user2Token;
+    private TokenDTO user3Token;
+
 
     // run before all tests to set-up user data for all testing
 //    https://www.baeldung.com/junit-5-test-order
@@ -65,7 +65,7 @@ public class AppControllerTests {
     }*/
 
 
-
+@Before
     public void Test2_1_login_users() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -98,43 +98,24 @@ public class AppControllerTests {
             e.printStackTrace();
         }
         System.out.println(user2Token);
-        assertNotNull(user1Token);
-    }
-@Before
-    public void Test6_6_login_users() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        LoginDTO newUser = new LoginDTO();
+        assertNotNull(user2Token);
 
-        //login user1 for testing
-        newUser.setUsername("user1");
-        newUser.setPassword("password");
-
-        HttpEntity<LoginDTO> entity = new HttpEntity<>(newUser, headers);
-        try {
-            user1Token = restTemplate.postForObject(API_BASE_URL + "/login", entity, TokenDTO.class);
-        } catch (RestClientResponseException e) {
-            e.printStackTrace();
-        } catch (ResourceAccessException e) {
-            e.printStackTrace();
-        }
-        System.out.println(user1Token);
-
-        //login user2 for testing
-        newUser.setUsername("user2");
+        //login user3 for testing
+        newUser.setUsername("user3");
         newUser.setPassword("password2");
 
         entity = new HttpEntity<>(newUser, headers);
         try {
-            user2Token = restTemplate.postForObject(API_BASE_URL + "/login", entity, TokenDTO.class);
+            user3Token = restTemplate.postForObject(API_BASE_URL + "/login", entity, TokenDTO.class);
         } catch (RestClientResponseException e) {
             e.printStackTrace();
         } catch (ResourceAccessException e) {
             e.printStackTrace();
         }
-        System.out.println(user2Token);
-        assertNotNull(user1Token);
+        System.out.println(user3Token);
+
     }
+
     @Test
 
     public void Test3_and_Test3_1_test_create_account_and_check_balance() {
@@ -150,6 +131,11 @@ public class AppControllerTests {
         entity = new HttpEntity<>(headers);
         restTemplate.exchange(API_BASE_URL + "/account/create", HttpMethod.POST, entity, Void.class);
 
+        headers = new HttpHeaders();
+        System.out.println("user3Token equals " + user3Token.getToken());
+        headers.setBearerAuth(user3Token.getToken());
+        entity = new HttpEntity<>(headers);
+        restTemplate.exchange(API_BASE_URL + "/account/create", HttpMethod.POST, entity, Void.class);
 
 
         BigDecimal newAccountBalance = restTemplate.exchange(API_BASE_URL + "/account/balance", HttpMethod.GET, entity, BigDecimal.class).getBody();
@@ -158,7 +144,7 @@ public class AppControllerTests {
     }
 
     @Test
-
+//@TODO bug where running all tests causes transfer to not deduct
     public void Test4_a_Test_4_b_test_create_and_get_by_transfer() {
         Transfer transfer = new Transfer(BigDecimal.valueOf(200.00), 1002, 1001);
         HttpHeaders headers = new HttpHeaders();
@@ -175,6 +161,18 @@ public class AppControllerTests {
         assertEquals(transfer.getUserFrom(),transferInDB.getUserFrom());
         assertEquals(transfer.getUserTo(),transferInDB.getUserTo());
     }
+    @Test
+    public void Test4_c_list_of_my_transfers() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(user1Token.getToken());
+        HttpEntity entity = new HttpEntity<>(headers);
+
+        List<Transfer> transferList= restTemplate.exchange(API_BASE_URL + "/transfers", HttpMethod.GET, entity, List.class).getBody();
+
+        assertEquals(transferList.size(),1);
+
+    }
+
     @Test
 
     public void Test5_test_self_no_transfer() {
@@ -201,7 +199,7 @@ public class AppControllerTests {
         List<User> listOfUsers= restTemplate.exchange(API_BASE_URL + "/list_of_users", HttpMethod.GET, entity, ArrayList.class).getBody();
     System.out.println(listOfUsers.toString());
 //        check that the list contains only/exactly user1 and user2
-        assertTrue(listOfUsers.size()==2);
+        assertEquals(3,listOfUsers.size());
 
 //        check user1
     System.out.println(listOfUsers.get(0));

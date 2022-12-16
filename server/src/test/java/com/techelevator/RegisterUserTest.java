@@ -60,7 +60,17 @@ public class RegisterUserTest {
         } catch (ResourceAccessException e) {
             e.printStackTrace();
         }
+        newUser.setUsername("user3");
+        newUser.setPassword("password2");
 
+        entity = new HttpEntity<>(newUser, headers);
+        try {
+            restTemplate.postForObject(API_BASE_URL + "/register", entity, Void.class); //https://stackoverflow.com/questions/30452318/how-to-handle-empty-response-in-spring-resttemplate
+        } catch (RestClientResponseException e) {
+            e.printStackTrace();
+        } catch (ResourceAccessException e) {
+            e.printStackTrace();
+        }
     }
     @Test
     public void Test2_login_users() {
@@ -97,4 +107,5 @@ public class RegisterUserTest {
         System.out.println(user2Token);
         assertNotNull(user1Token);
     }
+
 }
